@@ -458,7 +458,7 @@ class MainFrame(wx.Frame):
                     },
                     kind=wx.ITEM_RADIO, )
                 # item.SetCheckable(True)
-                item.Enable()
+                # item.Enable()
                 self.viewTypeMenu.AppendItem(item)
                 item.Check(root == self.viewType)
                 self.Bind(wx.EVT_MENU, chooser(root), id=item.GetId())
