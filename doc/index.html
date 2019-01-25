@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html dir="ltr" lang="en-ca">
+
+<head>
+
+  <link rel="icon" type="image/png" href="/maps/favicon.png">
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <title>RunSnakeRun Python (c)Profile Viewer</title>
+
+  <link rel="stylesheet" type="text/css" href="toolkit.css">
+  <meta name="author" content="Mike C. Fletcher">
+</head>
+
+<body style="direction: ltr;">
+  <h1>RunSnakeRun<br>
+  </h1>
+  <p class="introduction"><img style="width: 64px; height: 64px;" alt="RunSnakeRun" src="pyaccellerate-64.png" align="right">RunSnakeRun is a small
+    GUI utility that allows you to view (Python) cProfile or Profile profiler dumps in a sortable GUI view. &nbsp;It allows
+    you to explore the profiler information using a "square map" visualization or sortable tables of data.&nbsp; It also
+    (experimentally) allows you to view the output of the Meliae "memory analysis" tool using the same basic visualisations.<br>
+  </p>
+  <h2>Features</h2>
+  <p>RunSnakeRun is a simple program, it doesn't provide all the bells-and-whistles of a program like KCacheGrind, it's intended
+    to allow for profiling your Python programs, and just your Python programs. &nbsp;What it does provide, for profile viewing:</p>
+  <ul>
+    <li>sortable data-grid views for raw profile information</li>
+    <ul>
+      <li>identity: function name, file-name, directory name</li>
+      <li>time-spent: cumulative, cumulative-per, local and local-per time</li>
+    </ul>
+    <ul>
+      <li>overall data-grid view</li>
+      <li>(all) callers-of-this-function, (all) callees-of-this-function views</li>
+    </ul>
+    <li>squaremap view of call tree</li>
+    <ul>
+      <li>size proportional to amount of time spent by the given parent in the given function</li>
+    </ul>
+    <li>squaremap view of packages/modules/functions</li>
+    <ul>
+      <li>size proportional to time spent in each package/module/function</li>
+    </ul>
+    <li>basic navigation (home, back, up)</li>
+  </ul>
+  <p>For <a href="https://launchpad.net/meliae">Meliae</a> memory-dump viewing, it provides:</p>
+  <ul>
+    <li>sortable data-grid views</li>
+    <li>squaremap of memory-usage</li>
+    <li>basic navigation<br>
+    </li>
+  </ul>
+  <h2><a name="install"></a>Installation<br>
+  </h2>
+  <p>You will need to have all of wxPython, <a href="http://pypi.python.org/pypi/SquareMap/">SquareMap</a> and <a href="http://pypi.python.org/pypi/RunSnakeRun">RunSnakeRun</a>    installed to use RunSnakeRun. &nbsp;You may also need the "python-profiler" package for your platform, which provides
+    the pstats view.&nbsp; You will likely want to use your platform wxPython package (i.e. a pre-built binary). For Debian/Ubuntu
+    distributions the prerequisite setup looks like this:
+  </p>
+  <pre>apt-get install python-profiler python-wxgtk2.8 python-setuptools</pre>
+
+  <p>RunSnakeRun and SquareMap will install well in a VirtualEnv if you would like to keep them isolated (normally you do not
+    want to use the <code>--no-site-packages</code> flag if you are doing this).&nbsp; I recommend this approach rather than
+    using easy_install directly on your Linux/OS-X host.<br>
+  </p>
+  <pre>virtualenv runsnake<br>source runsnake/bin/activate<br></pre>
+  <p>If you already have Python setuptools installed (a.k.a. <a href="http://peak.telecommunity.com/DevCenter/EasyInstall">easy_install</a>),
+    you should be able to install the Python packages with:</p>
+
+  <pre>easy_install SquareMap RunSnakeRun<br></pre>
+  <p>You will require a modern <a href="http://www.wxpython.org/">wxPython (e.g. 2.8)</a> and Python 2.x (e.g. 2.5 through 2.7)
+    installation. &nbsp;The setup will create a script named "runsnake" on Linux machines which launches the profile viewer.&nbsp;
+    On OS-X machines a wrapper script runsnake is created that runs the runsnake32 executable with a flag to tell Python
+    to use the 32-bit implementation (for wxPython compatibility).&nbsp; On Win32 machines, a Scripts\runsnake.exe executable
+    is created.&nbsp; If you have added your scripts directory to the PATH then this will be available from the command-line.
+    <br>
+  </p>
+  <h2><a name="usage"></a>Usage</h2>
+  <p>If you are new to profiling you may wish to check out:</p>
+
+  <ul>
+    <li>my (<a href="http://www.vrplumber.com/">Mike Fletcher</a>'s) <a href="http://blip.tv/pycon-us-videos-2009-2010-2011/introduction-to-python-profiling-1966784">presentation at PyCon 2009</a>      which tries to explain the use of profiling as a tool for optimization in Python<br>
+    </li>
+    <li><a href="http://blip.tv/file/3988199">W. Matthew Wilson's presentation at PyOhio</a> on optimizing Python code<br>
+    </li>
+  </ul>
+
+
+
+  <h3>cProfile Viewing<br>
+  </h3>
+  <p>To use cProfile to capture your application's profile data, either using the command-line, like so:</p>
+  <pre>$ python -m cProfile -o &lt;outputfilename&gt; &lt;script-name&gt; &lt;options&gt;<br></pre>
+  <p>Or in code, like so:<br>
+  </p>
+
+  <pre>import cProfile<br>command = """reactor.run()"""<br>cProfile.runctx( command, globals(), locals(), filename="OpenGLContext.profile" )</pre>
+  <p>To view the results of your run:<br>
+  </p>
+  <pre>python runsnake.py OpenGLContext.profile<br></pre>
+  <p>There will be a brief delay as the application is created and begins the loading process, then you should see something
+    like this:</p>
+  <p style="text-align: center;"><img style="width: 1113px; height: 872px;" alt="Screenshot of the application viewing a HotShot profile" src="screenshot-2.0.png"><br>
+  </p>
+  <p>Click on any column title to sort by that property within that list. &nbsp;Select a record in the left-most list view to
+    see a breakdown of that record in the right-side list views. &nbsp;Choose the appropriate view on the right via the tabs.
+    &nbsp;You can resize the borders between the lists and square-map views. &nbsp;You can select a package/module/function
+    hierarchic view via the menus. &nbsp;You can also toggle use of percentage displays there.</p>
+  <h3>Meliae Memory Analysis</h3>
+  <p><span class="technical"></span>Note: this feature is considered experimental, the memory consumed loading even a tiny meliae
+    dump is enormous, so real-world programs will make RunSnakeRun quite slow and require a very large amount of RAM (far
+    more than the process being viewed).
+    <br>
+    <span class="technical"></span></p>
+  <p>To install<a href="https://launchpad.net/meliae"> Meliae</a>, you will need a working C extension compilation environment
+    (Meliae uses a Cython extension):</p>
+  <pre>easy_install meliae<br></pre>
+  <p>Now instrument your application to be able to trigger a memory dump at the moment you would like to capture, like so:</p>
+  <pre>from meliae import scanner<br>scanner.dump_all_objects( filename ) # you can pass a file-handle if you prefer<br></pre>
+  <p>The memory dump will generally be quite large (e.g. 2MB to describe an application with 200KB of user-controllable memory
+    usage (i.e. not the interpreter itself)) and for any real application will take an extremely long time to load (multiple
+    minutes for 16MB dumps).</p>
+  <pre>$ runsnakemem &lt;filename&gt;<br></pre>
+
+
+  <p style="text-align: center;"><img style="width: 1920px; height: 1159px;" alt="Screenshot of a meliae memory view" src="meliae-sample.png"></p>
+  <p style="text-align: left;">The Meliae loader in RunSnakeRun performs the following simplifications:</p>
+  <ul>
+    <li>only displays memory which is reachable from a module (there is normally &gt; 1MB of unreachable objects included in
+      a meliae dump)<br>
+    </li>
+    <li>treats modules as memory-cost barriers, so referencing a module does not cost the referrer anything</li>
+    <li>treats all (reachable) references to an instance as sharing the cost of the instance equally</li>
+    <li>treats loops as being a separate object which holds all objects in the loop, breaking inter-loop references but retaining
+      child references, all references to the loop members become references to the loop
+    </li>
+    <li>eliminates dictionary objects from modules (always) and from types and classes when the dictionary is only referenced
+      by the class/type, the cost of the dictionary is folded into the cost of the parent object (note: this means that function
+      __globals__ references are "0-cost" and do not create loops)</li>
+    <li>compresses large numbers (&gt;=10 currently) of "simple" objects of the same type held by a single parent into a "&lt;many&gt;"
+      object with the type as the name</li>
+  </ul>
+  <p>Even with those simplifications, however, the program is tracking most ints, strings, tuples, lists, etc. separately, which
+    uses a large amount of RAM and slows down the GUI substantially.<br>
+  </p>
+
+  <h2><a name="code"></a>Code Access and Contributions</h2>
+  <p>RunSnakeRun is reasonably stable. &nbsp;I don't tend to do much work on it, as it tends to just work. &nbsp;My (personal)
+    current wish list for the project follows:</p>
+  <ul>
+    <li>Speed up and reduce memory requirements for meliae loading</li>
+    <li>Clean up the meliae loader (was grown organically from a quick hack and doesn't particularly invite further hacking)<br>
+    </li>
+
+  </ul>
+  <p>If you have an idea, feel free to check out the code and&nbsp;implement the new&nbsp;feature. &nbsp;I'm certainly willing
+    to entertain new features or bug-fix requests as well. &nbsp;The code is available in bzr here:</p>
+  <pre>bzr branch lp:~mcfletch/squaremap/trunk squaremap<br>cd squaremap<br>python setup.py develop<br>bzr branch lp:~mcfletch/profile_viewer/trunk profile_viewer<br>cd profile_viewer<br>python setup.py develop<br></pre>
+  <p>You can <a href="mailto:mcfletch@vrplumber.com">contact me directly</a> if you'd like to contribute. &nbsp;Or you can just
+    set up a bzr branch on LaunchPad and request a merge.</p>
+  <h2><a name="roadmap"></a>Roadmap/Wish-list</h2>
+  <p>This is just a listing of things that either I or others have requested as features:</p>
+  <ul>
+    <li>provide comparison views and "progress" views that compare across multiple profiles</li>
+    <li>(re)support&nbsp;Hotshot profile dumps (removed because Hotshot itself was deprecated)</li>
+    <li>support&nbsp;Robert Kern's line_profiler module (line and import timings)</li>
+    <li>support&nbsp;IronPython profiles (with cleanup on load to remove "noise" functions)</li>
+    <li>with a line-profiling module, allow per-line profile views</li>
+    <li>support&nbsp;(C)&nbsp;calltree/cachegrind files (as used by kcachegrind)</li>
+    <li>clean up the UI code (very hacky)</li>
+    <li>configuration/storage of preferences such as column widths, rounded corners, padding, etc.</li>
+    <li>utility functions for capturing data</li>
+  </ul>
+  <h2><a name="othertools"></a>Other Tools</h2>
+  <p>RunSnakeRun is by no means a comprehensive tool-set for profiling, you may want to have any or all of these other tools
+    available for your profiling needs:</p>
+  <ul>
+    <li><a href="http://code.google.com/p/jrfonseca/wiki/Gprof2Dot">Gprof2Dot</a> -- Converts various Profile formats into dot-format
+      graphs
+      <br>
+    </li>
+    <li>Robert Kern's <a href="http://pypi.python.org/pypi/line_profiler/">line_profiler</a> -- Cython based Python profiler
+      with line timings</li>
+    <li>KCacheGrind -- KDE viewer for CacheGrind C-level profiler or converted Python profiles (via <a href="http://pypi.python.org/pypi/pyprof2calltree/">pyprof2calltree</a>),
+      KCacheGrind is basically what RunSnakeRun started off trying to imitate save that RunSnakeRun was intended to be Python
+      specific and cross-platform
+    </li>
+    <li><a href="http://pypi.python.org/pypi/profilehooks">profilehooks</a> -- specify which function to profile by using a decorator
+      on a particular function</li>
+  </ul>
+  <h2><a name="download"></a>Releases/Downloads</h2>
+  <ul>
+    <li><a href="http://pypi.python.org/packages/source/R/RunSnakeRun/RunSnakeRun-2.0.3.tar.gz">2.0.3</a> -- Stores list control
+      column widths in config file (contributed by Gerald Dalley), minor bug-fixes, coldshot profiler support, wxPython compatability,
+      do not use separators on OSX<br>
+    </li>
+    <li><a href="http://pypi.python.org/packages/source/R/RunSnakeRun/RunSnakeRun-2.0.2a1.tar.gz">2.0.2a1</a> -- Stores window
+      position and size in config file<br>
+    </li>
+
+    <li><a href="http://pypi.python.org/packages/source/R/RunSnakeRun/RunSnakeRun-2.0.1.tar.gz">2.0.1</a> -- Fix for OS-X loading
+      (32-bit mode forced)<br>
+    </li>
+
+    <li><a href="http://pypi.python.org/packages/source/R/RunSnakeRun/RunSnakeRun-2.0.1b6.tar.gz">2.0.1b6</a> -- Fixes regression
+      from introducing runsnakemem command<br>
+    </li>
+
+    <li>2.0.1b5 -- Fix regression for OS-X during work-around for Win32, add program icon, provide a dedicated command alias
+      for meliae loading (runsnakemem dump.memory)
+      <br>
+    </li>
+
+    <li>2.0.1b4 -- Win32 source-code-control bug work-around (disables source-code view on Win32)<br>
+    </li>
+    <li><a href="http://pypi.python.org/packages/source/R/RunSnakeRun/RunSnakeRun-2.0.1b3.tar.gz">2.0.1b3</a> -- Performance
+      and correctness fixes for meliae loads (still slow, but not as horribly slow)<br>
+    </li>
+
+    <li><a href="http://pypi.python.org/packages/source/R/RunSnakeRun/RunSnakeRun-2.0.1b1.tar.gz">2.0.1b1</a> -- Experimental
+      support for meliae loads<br>
+    </li>
+
+    <li><a href="http://pypi.python.org/packages/source/R/RunSnakeRun/RunSnakeRun-2.0.0b6.tar.gz">2.0.0b6</a> -- Fixes and enhancements
+      by Marius Gedminas (percent-in-tooltips, code restructuring, home-button fix), display source-code for functions when
+      selected, make SquareMap an explicit dependency, more robust selection of "root" nodes (better first-view selection)
+      <br>
+    </li>
+
+    <li>2.0.0b5 -- Add names of loaded files to the window title, use same colour for each node, make colours cycle across far
+      wider range of colours, bug-fixes</li>
+    <li><a href="http://pypi.python.org/pypi/RunSnakeRun/2.0.0b4">2.0.0b4</a> -- Win32 bug-fixes, drawing of labels on squaremap
+      where there's enough space</li>
+    <li><a href="http://pypi.python.org/packages/source/R/RunSnakeRun/RunSnakeRun-2.0.0b1.zip">2.0.0b1</a> -- packaging fixes,
+      UI fixes</li>
+    <li>2.0.0a1 -- Eliminate support for (obsolete) Hotshot profiles, add squaremap visualization and callee/caller views, lots
+      of UI work to make the application more usable, preliminary i18n work (just gettext markup)</li>
+    <li><a href="RunSnakeRun-1.0.4.tar.gz">1.0.4</a> -- Add preliminary support for standard cProfile/profile profile results,
+      note that we do not load cProfile results incrementally. &nbsp;Switch to numpy support from Numeric. &nbsp;Use setuptools
+      for distribution. &nbsp;Provide source repository access.</li>
+    <li><a href="RunSnakeRun-1.0.3.tar.gz">1.0.3</a> -- Fix stupid bug introduced by last fix</li>
+    <li><a href="RunSnakeRun-1.0.2.tar.gz">1.0.2</a> -- Magically grow the stack-tracking structures if we pass recursion limits,
+      this will be slow, but it should allow for loading even extremely stack-exhausting programs
+    </li>
+    <li><a href="RunSnakeRun-1.0.1.tar.gz">1.0.1</a> -- Bug-fix, increases stack-tracking size to 10x recursion limit, instead
+      of == recursion limit, but as of yet, doesn't seem to fix the reported stack-exhaustion
+    </li>
+    <li><a href="RunSnakeRun-1.0.0.tar.gz">1.0.0</a> -- Initial release, no fancy features, just the raw functionality</li>
+  </ul>
+  <p class="footer">Copyright 2005-2011 Contributors<br>
+  </p>
+</body>
+
+</html>

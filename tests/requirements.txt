@@ -1,0 +1,2 @@
+twine
+git+https://github.com/msabramo/setuptools-markdown.git  # For building wheels
